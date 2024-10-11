@@ -10,7 +10,7 @@ class conn_c : public acl::connect_client
 {
 public:
     // 构造函数
-    conn_c(char *destaddr, int ctimeout = 30, int rtimeout = 60);
+    conn_c(char const*destaddr, int ctimeout = 30, int rtimeout = 60);
     // 析构函数
     ~conn_c(void);
 
