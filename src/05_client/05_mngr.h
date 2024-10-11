@@ -10,5 +10,5 @@ class mngr_c: public acl::connect_manager{
 
 protected:
     //创建连接池
-    acl::connect_pool* create_pool(char const* destaddr,ssize_t count,ssize_t index);
+    acl::connect_pool* create_pool  (char const* destaddr,size_t count,size_t index);
 };
