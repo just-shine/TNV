@@ -273,7 +273,7 @@ int conn_c::upload(char const *appid, char const *userid,
         return SOCKET_ERROR;
     }
     // 包体指针
-    char *body = "";
+    char *body = nullptr;
     // 接收包体
     int result = recvbody(&body, &bodylen);
     if (result == STATUS_ERROR)
