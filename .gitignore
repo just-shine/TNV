@@ -1,0 +1,6 @@
+.vscode
+/bin
+/download
+/upload
+*.o
+*.gch

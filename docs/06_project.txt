@@ -1,0 +1,128 @@
+========
+项目目录
+========
+
+TNV
+├── docs                                     文档
+│   ├── 01_overview.txt                      项目概述
+│   ├── 02_overall.txt                       总体架构
+│   ├── 03_protocol.txt                      报文规约
+│   ├── 04_database.txt                      库表结构
+│   ├── 05_depenv.txt                        开发环境
+│   ├── 06_project.txt                       项目目录
+│   ├── 07_code.txt                          代码层级
+│   ├── 08_test.txt                          安装测试
+│   ├── 09_gluster.txt                       文件同步
+│   └── 10_plan.txt                          开发计划
+├── src                                      源代码
+│   ├── 01_common                            公共模块
+│   │   ├── 01_types.h                       定义所有模块都会用到的宏和数据类型
+│   │   ├── 02_proto.h                       定义与报文规约有关的宏和数据类型
+│   │   ├── 03_util.h                        声明几个实用函数
+│   │   └── 04_util.cpp                      定义几个实用函数
+│   ├── 02_tracker                           跟踪服务器
+│   │   ├── 01_globals.h                     声明全局变量
+│   │   ├── 02_globals.cpp                   定义全局变量
+│   │   ├── 03_cache.h                       声明缓存类
+│   │   ├── 04_cache.cpp                     实现缓存类
+│   │   ├── 05_db.h                          声明数据库访问类
+│   │   ├── 06_db.cpp                        实现数据库访问类
+│   │   ├── 07_service.h                     声明业务服务类
+│   │   ├── 08_service.cpp                   实现业务服务类
+│   │   ├── 09_status.h                      声明存储服务器状态检查线程类
+│   │   ├── 10_status.cpp                    实现存储服务器状态检查线程类
+│   │   ├── 11_server.h                      声明服务器类
+│   │   ├── 12_server.cpp                    实现服务器类
+│   │   ├── 13_main.cpp                      定义主函数
+│   │   └── Makefile                         构建脚本
+│   ├── 03_id                                ID服务器
+│   │   ├── 01_globals.h                     声明全局变量
+│   │   ├── 02_globals.cpp                   定义全局变量
+│   │   ├── 03_db.h                          声明数据库访问类
+│   │   ├── 04_db.cpp                        实现数据库访问类
+│   │   ├── 05_service.h                     声明业务服务类
+│   │   ├── 06_service.cpp                   实现业务服务类
+│   │   ├── 07_server.h                      声明服务器类
+│   │   ├── 08_server.cpp                    实现服务器类
+│   │   ├── 09_main.cpp                      定义主函数
+│   │   └── Makefile                         构建脚本
+│   ├── 04_storage                           存储服务器
+│   │   ├── 01_globals.h                     声明全局变量
+│   │   ├── 02_globals.cpp                   定义全局变量
+│   │   ├── 03_cache.h                       声明缓存类
+│   │   ├── 04_cache.cpp                     实现缓存类
+│   │   ├── 05_db.h                          声明数据库访问类
+│   │   ├── 06_db.cpp                        实现数据库访问类
+│   │   ├── 07_file.h                        声明文件操作类
+│   │   ├── 08_file.cpp                      实现文件操作类
+│   │   ├── 09_id.h                          声明ID客户机类
+│   │   ├── 10_id.cpp                        实现ID客户机类
+│   │   ├── 11_service.h                     声明业务服务类
+│   │   ├── 12_service.cpp                   实现业务服务类
+│   │   ├── 13_tracker.h                     声明跟踪客户机线程类
+│   │   ├── 14_tracker.cpp                   实现跟踪客户机线程类
+│   │   ├── 15_server.h                      声明服务器类
+│   │   ├── 16_server.cpp                    实现服务器类
+│   │   ├── 17_main.cpp                      定义主函数
+│   │   └── Makefile                         构建脚本
+│   ├── 05_client                            客户机
+│   │   ├── 01_conn.h                        声明连接类
+│   │   ├── 02_conn.cpp                      实现连接类
+│   │   ├── 03_pool.h                        声明连接池类
+│   │   ├── 04_pool.cpp                      实现连接池类
+│   │   ├── 05_mngr.h                        声明连接池管理器类
+│   │   ├── 06_mngr.cpp                      实现连接池管理器类
+│   │   ├── 07_client.h                      声明客户机类
+│   │   ├── 08_client.cpp                    实现客户机类
+│   │   ├── 09_main.cpp                      定义主函数
+│   │   └── Makefile                         构建脚本
+│   ├── 06_http                              HTTP服务器
+│   │   ├── 01_status.h                      响应状态码
+│   │   ├── 02_globals.h                     声明全局变量
+│   │   ├── 03_globals.cpp                   定义全局变量
+│   │   ├── 04_service.h                     声明业务服务类
+│   │   ├── 05_service.cpp                   实现业务服务类
+│   │   ├── 06_server.h                      声明服务器类
+│   │   ├── 07_server.cpp                    实现服务器类
+│   │   ├── 08_main.cpp                      定义主函数
+│   │   └── Makefile                         构建脚本
+│   ├── install                              安装脚本
+│   └── uninstall                            卸载脚本
+├── etc                                      配置文件
+│   ├── tracker.cfg                          跟踪服务器配置文件
+│   ├── id.cfg                               ID服务器配置文件
+│   ├── storage.cfg                          存储服务器配置文件
+│   └── http.cfg                             HTTP服务器配置文件
+├── sql                                      建表脚本
+│   ├── tracker.sql                          跟踪服务器数据库建表脚本
+│   ├── id.sql                               ID服务器数据库建表脚本
+│   └── storage.sql                          存储服务器数据库建表脚本
+├── lib                                      库
+│   └── libclient.a                          客户机接口库
+├── bin                                      可执行程序
+│   ├── tracker                              跟踪服务器可执行程序
+│   ├── id                                   ID服务器可执行程序
+│   ├── storage                              存储服务器可执行程序
+│   ├── client                               客户机可执行程序
+│   └── http                                 HTTP服务器可执行程序
+├── upload                                   上传
+│   ├── 001.mp4                              上传文件
+│   ├── 002.mp4                              上传文件
+│   ├── 003.mp4                              上传文件
+│   ├── 004.mp4                              上传文件
+│   └── 005.mp4                              上传文件
+├── download                                 下载
+│   ├── 5f9e3fa7085e5aa25387c8cf7b5f29000117 下载文件
+│   ├── 5f9e3fbd0c1ae14107aa20f9b360cd000131 下载文件
+│   ├── 5f9e3fd10c4328823b46396d056950000197 下载文件
+│   ├── 5f9e3fe00b8db7040fdf13ca069961000132 下载文件
+│   └── 5f9e3ff300edbc468eafe196475dc7000149 下载文件
+└── data                                     数据
+    └── 000                                  一级子目录
+        └── 000                              二级子目录
+            └── 000                          三级子目录
+                ├── 5F9E3FA7_000             存储文件
+                ├── 5F9E3FBD_001             存储文件
+                ├── 5F9E3FD1_002             存储文件
+                ├── 5F9E3FE0_003             存储文件
+                └── 5F9E3FF3_004             存储文件
