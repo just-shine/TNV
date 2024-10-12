@@ -16,8 +16,8 @@ void status_c::stop(void) {
 
 // 线程过程
 void* status_c::run(void) {
-    for(time_t last = time(nullptr); !m_stop; sleep(1)) {
-        time_t now = time(nullptr); // 现在
+    for (time_t last = time(NULL); !m_stop; sleep(1)) {
+        time_t now = time(NULL); // 现在
 
         // 若现在距离最近一次检查存储服务器状态已足够久
         if (now - last >= cfg_interval) {
@@ -26,12 +26,12 @@ void* status_c::run(void) {
         }
     }
 
-    return nullptr;
+    return NULL;
 }
 
 // 检查存储服务器状态
 int status_c::check(void) const {
-    time_t now = time(nullptr); // 现在
+    time_t now = time(NULL); // 现在
 
     // 互斥锁加锁
     if ((errno = pthread_mutex_lock(&g_mutex))) {
@@ -48,7 +48,7 @@ int status_c::check(void) const {
             group->second.begin(); si != group->second.end(); ++si)
             // 若该存储服务器心跳停止太久
             if (now - si->si_btime >= cfg_interval)
-                // 则将其标记为离线
+                // 则将其状态标记为离线
                 si->si_status = STORAGE_STATUS_OFFLINE;
 
     // 互斥锁解锁

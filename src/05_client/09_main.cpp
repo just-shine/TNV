@@ -2,21 +2,21 @@
 // 定义主函数
 //
 #include <unistd.h>
-#include <acl-lib/acl/lib_acl.h>
-#include <acl-lib/acl_cpp/lib_acl.hpp>
+#include <lib_acl.h>
+#include <lib_acl.hpp>
 #include "01_types.h"
 #include "07_client.h"
 
 // 打印命令行用法
 void usage(char const* cmd) {
-    fprintf(stderr, "Groups   : %s <taddrs> groups\n", cmd);
-    fprintf(stderr, "Upload   : %s <taddrs> upload   "
+    fprintf(stderr, "Groups  : %s <taddrs> groups\n", cmd);
+    fprintf(stderr, "Upload  : %s <taddrs> upload   "
         "<appid> <userid> <filepath>\n", cmd);
-    fprintf(stderr, "Filesize : %s <taddrs> filesize "
+    fprintf(stderr, "Filesize: %s <taddrs> filesize "
         "<appid> <userid> <fileid>\n", cmd);
-    fprintf(stderr, "Download : %s <taddrs> download "
+    fprintf(stderr, "Download: %s <taddrs> download "
         "<appid> <userid> <fileid> <offset> <size>\n", cmd);
-    fprintf(stderr, "Delete   : %s <taddrs> delete   "
+    fprintf(stderr, "Delete  : %s <taddrs> delete   "
         "<appid> <userid> <fileid>\n", cmd);
 }
 
@@ -28,7 +28,8 @@ std::string genfileid(char const* userid) {
     gettimeofday(&now, NULL);
 
     acl::string str;
-    str.format("%s@%d@%lX@%d", userid, getpid(), acl_pthread_self(), rand());
+    str.format("%s@%d@%lX@%d",
+        userid, getpid(), acl_pthread_self(), rand());
 
     acl::md5 md5;
     md5.update(str.c_str(), str.size());

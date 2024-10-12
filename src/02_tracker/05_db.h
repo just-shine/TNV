@@ -5,7 +5,7 @@
 
 #include <string>
 #include <vector>
-#include </usr/include/mysql/mysql.h>
+#include <mysql.h>
 //
 // 数据库访问类
 //

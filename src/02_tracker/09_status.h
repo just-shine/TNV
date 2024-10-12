@@ -3,7 +3,7 @@
 //
 #pragma once
 
-#include<acl-lib/acl_cpp/lib_acl.hpp>
+#include <lib_acl.hpp>
 //
 // 存储服务器状态检查线程类
 //

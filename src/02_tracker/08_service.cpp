@@ -2,8 +2,8 @@
 // 实现业务服务类
 //
 #include <algorithm>
-#include "../01_common/02_proto.h"
-#include "../01_common/03_util.h"
+#include "02_proto.h"
+#include "03_util.h"
 #include "01_globals.h"
 #include "05_db.h"
 #include "07_service.h"
@@ -232,12 +232,12 @@ bool service_c::groups(acl::socket_stream* conn) const {
                 "               JOIN TIME: %s"
                 "               BEAT TIME: %s"
                 "                  STATUS: ",
-            si->si_version,
-            si->si_hostname,
-            si->si_addr, si->si_port,
-            std::string(ctime(&si->si_stime)).c_str(),
-            std::string(ctime(&si->si_jtime)).c_str(),
-            std::string(ctime(&si->si_btime)).c_str());
+                si->si_version,
+                si->si_hostname,
+                si->si_addr, si->si_port,
+                std::string(ctime(&si->si_stime)).c_str(),
+                std::string(ctime(&si->si_jtime)).c_str(),
+                std::string(ctime(&si->si_btime)).c_str());
 
             switch (si->si_status) {
                 case STORAGE_STATUS_OFFLINE:
@@ -313,7 +313,7 @@ int service_c::join(storage_join_t const* sj, char const* saddr) const {
             // 若待加入存储服务器已在该列表中
             if (!strcmp(si->si_hostname, sj->sj_hostname) &&
                 !strcmp(si->si_addr, saddr)) {
-                // 更新列表中的相应记录
+                // 更新该列表中的相应记录
                 strcpy(si->si_version, sj->sj_version); // 版本
                 si->si_port   = sj->sj_port;            // 端口号
                 si->si_stime  = sj->sj_stime;           // 启动时间
@@ -386,8 +386,8 @@ int service_c::beat(char const* groupname, char const* hostname,
             // 若待标记存储服务器已在该列表中
             if (!strcmp(si->si_hostname, hostname) &&
                 !strcmp(si->si_addr, saddr)) {
-                // 更新列表中的相应记录
-                si->si_btime  = time(nullptr);            // 心跳时间
+                // 更新该列表中的相应记录
+                si->si_btime  = time(NULL);            // 心跳时间
                 si->si_status = STORAGE_STATUS_ACTIVE; // 状态
                 break;
             }
@@ -497,7 +497,7 @@ int service_c::group_of_user(char const* appid,
         }
 
         // 随机抽取组名
-        srand(time(nullptr));
+        srand(time(NULL));
         groupname = groupnames[rand() % groupnames.size()];
 
         // 设置用户ID和组名的对应关系
@@ -521,13 +521,13 @@ int service_c::saddrs_of_group(char const* groupname,
     int result = OK;
 
     // 根据组名在组表中查找特定组
-    std::map<std::string, std::list<storage_info_t> >::iterator
+    std::map<std::string, std::list<storage_info_t> >::const_iterator
         group = g_groups.find(groupname);
     if (group != g_groups.end()) { // 若找到该组
         if (!group->second.empty()) { // 若该组的存储服务器列表非空
             // 在该组的存储服务器列表中，从随机位置开
             // 始最多抽取三台处于活动状态的存储服务器
-            srand(time(nullptr));
+            srand(time(NULL));
             int nsis = group->second.size();
             int nrand = rand() % nsis;
             std::list<storage_info_t>::const_iterator si =
@@ -613,9 +613,9 @@ bool service_c::error(acl::socket_stream* conn, short errnumb,
     desc.format("[%s] %s", g_hostname.c_str(), errdesc);
     memset(errdesc, 0, sizeof(errdesc));
     strncpy(errdesc, desc.c_str(), ERROR_DESC_SIZE - 1);
-    ssize_t desclen = strlen(errdesc);
+    size_t desclen = strlen(errdesc);
     desclen += desclen != 0;
-    
+
     // |包体长度|命令|状态|错误号|错误描述|
     // |    8   |  1 |  1 |   2  | <=1024 |
     // 构造响应

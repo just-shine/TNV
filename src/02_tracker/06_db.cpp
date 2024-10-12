@@ -6,7 +6,7 @@
 #include "05_db.h"
 
 // 构造函数
-db_c::db_c(void): m_mysql(mysql_init(nullptr)) { // 创建MySQL对象
+db_c::db_c(void): m_mysql(mysql_init(NULL)) { // 创建MySQL对象
     if (!m_mysql)
         logger_error("create dao fail: %s", mysql_error(m_mysql));
 }
@@ -16,7 +16,7 @@ db_c::~db_c(void) {
     // 销毁MySQL对象
     if (m_mysql) {
         mysql_close(m_mysql);
-        m_mysql = nullptr;
+        m_mysql = NULL;
     }
 }
 
@@ -28,7 +28,7 @@ int db_c::connect(void) {
     for (std::vector<std::string>::const_iterator maddr =
         g_maddrs.begin(); maddr != g_maddrs.end(); ++maddr)
         if ((m_mysql = mysql_real_connect(mysql, maddr->c_str(),
-            "root", "123456", "tnv_trackerdb", 0, nullptr, 0)))
+            "root", "123456", "tnv_trackerdb", 0, NULL, 0)))
             return OK;
 
     logger_error("connect database fail: %s",
@@ -112,7 +112,7 @@ int db_c::get(std::vector<std::string>& groupnames) const {
     acl::string sql;
     sql.format("SELECT group_name FROM t_groups_info;");
     if (mysql_query(m_mysql, sql.c_str())) {
-        logger_error("insert database fail: %s, sql: %s",
+        logger_error("query database fail: %s, sql: %s",
             mysql_error(m_mysql), sql.c_str());
         return ERROR;
     }

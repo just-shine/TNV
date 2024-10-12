@@ -1,4 +1,4 @@
-PROJ   = ../../bin/tracker
+PROJ   = ../../bin/id
 OBJS   = $(patsubst %.cpp, %.o, $(wildcard ../01_common/*.cpp *.cpp))
 CC     = g++
 LINK   = g++

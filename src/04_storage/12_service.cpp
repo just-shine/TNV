@@ -3,8 +3,8 @@
 //
 #include <linux/limits.h>
 #include <algorithm>
-#include "../01_common/02_proto.h"
-#include "../01_common/03_util.h"
+#include "02_proto.h"
+#include "03_util.h"
 #include "01_globals.h"
 #include "05_db.h"
 #include "07_file.h"
@@ -67,7 +67,7 @@ bool service_c::upload(acl::socket_stream* conn,
     // |包体长度|命令|状态|应用ID|用户ID|文件ID|文件大小|文件内容|
     // |    8   |  1 |  1 |  16  |  256 |  128 |    8   |文件大小|
     // 检查包体长度
-    long long expected = APPID_SIZE + USERID_SIZE + FILEID_SIZE +
+    long long expected = APPID_SIZE + USERID_SIZE +FILEID_SIZE +
         BODYLEN_SIZE;
     if (bodylen < expected) {
         error(conn, -1, "invalid body length: %lld < %lld",
@@ -261,7 +261,7 @@ bool service_c::download(acl::socket_stream* conn,
     if (size < 0 || filesize - offset < size) {
         logger_error("invalid size, %lld is not between 0 and %lld",
             size, filesize - offset);
-        error(conn, -1, "invalid size, %lld is not between 0 and %lld",
+        error(conn, -1, "invalid offset, %lld is not between 0 and %lld",
             size, filesize - offset);
         return false;
     }
@@ -283,8 +283,7 @@ bool service_c::download(acl::socket_stream* conn,
 }
 
 // 处理来自客户机的删除文件请求
-bool service_c::del(acl::socket_stream* conn,
-    long long bodylen) const {
+bool service_c::del(acl::socket_stream* conn, long long bodylen) const {
     // |包体长度|命令|状态|应用ID|用户ID|文件ID|
     // |    8   |  1 |  1 |  16  |  256 |  128 |
     // 检查包体长度
@@ -350,7 +349,7 @@ bool service_c::del(acl::socket_stream* conn,
 // 生成文件路径
 int service_c::genpath(char* filepath) const {
     // 从存储路径表中随机抽取一个存储路径
-    srand(time(nullptr));
+    srand(time(NULL));
     int nspaths = g_spaths.size();
     int nrand = rand() % nspaths;
     std::string spath = g_spaths[nrand];
@@ -373,6 +372,7 @@ long service_c::id512(long id) const {
         result += (id % 512) * i;
         id /= 512;
     }
+
     return result;
 }
 
@@ -389,7 +389,7 @@ int service_c::id2path(char const* spath, long fileid,
     unsigned short subdir1 = (fileid / 1000000000) % 1000; // 一级子目录
     unsigned short subdir2 = (fileid / 1000000) % 1000;    // 二级子目录
     unsigned short subdir3 = (fileid / 1000) % 1000;       // 三级子目录
-    time_t         curtime = time(nullptr);                   // 当前时间戳
+    time_t         curtime = time(NULL);                   // 当前时间戳
     unsigned short postfix = (fileid / 1) % 1000;          // 文件名后缀
 
     // 格式化完整的文件路径
@@ -552,9 +552,9 @@ bool service_c::error(acl::socket_stream* conn, short errnumb,
     desc.format("[%s] %s", g_hostname.c_str(), errdesc);
     memset(errdesc, 0, sizeof(errdesc));
     strncpy(errdesc, desc.c_str(), ERROR_DESC_SIZE - 1);
-    ssize_t desclen = strlen(errdesc);
+    size_t desclen = strlen(errdesc);
     desclen += desclen != 0;
-    
+
     // |包体长度|命令|状态|错误号|错误描述|
     // |    8   |  1 |  1 |   2  | <=1024 |
     // 构造响应

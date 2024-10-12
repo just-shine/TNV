@@ -1,9 +1,9 @@
 // 客户机
 // 实现客户机类
 //
-#include<acl-lib/acl_cpp/lib_acl.hpp>
-#include "../01_common/01_types.h"
-#include "../01_common/03_util.h"
+#include <lib_acl.h>
+#include "01_types.h"
+#include "03_util.h"
 #include "01_conn.h"
 #include "03_pool.h"
 #include "05_mngr.h"
@@ -11,9 +11,9 @@
 
 #define MAX_SOCKERRS 10 // 套接字通信错误最大次数
 
-acl::connect_manager* client_c::s_mngr = NULL; // 连接池管理器
-std::vector<std::string> client_c::s_taddrs; // 跟踪服务器地址表
-int client_c::s_scount = 8; // 存储服务器连接数上限
+acl::connect_manager* client_c::s_mngr = NULL;
+std::vector<std::string> client_c::s_taddrs;
+int client_c::s_scount = 8;
 
 // 初始化
 int client_c::init(char const* taddrs,
@@ -21,7 +21,7 @@ int client_c::init(char const* taddrs,
     if (s_mngr)
         return OK;
 
-    // 跟踪服务器地址列表
+    // 跟踪服务器地址表
     if (!taddrs || !*taddrs) {
         logger_error("tracker addresses is null");
         return ERROR;
@@ -50,7 +50,7 @@ int client_c::init(char const* taddrs,
     // 创建连接池管理器
     if (!(s_mngr = new mngr_c)) {
         logger_error("create connection pool manager fail: %s",
-            acl::last_serror());
+            acl_last_serror());
         return ERROR;
     }
 
@@ -265,7 +265,7 @@ int client_c::upload(char const* appid, char const* userid,
                 }
                 return result;
             }
-        }        
+        }
     }
 
     return result;
@@ -347,7 +347,7 @@ int client_c::upload(char const* appid, char const* userid,
                 }
                 return result;
             }
-        }        
+        }
     }
 
     return result;
@@ -374,7 +374,7 @@ int client_c::filesize(char const* appid, char const* userid,
     int result;
     std::string ssaddrs;
     if ((result = saddrs(appid, userid, fileid, ssaddrs)) != OK)
-        return result;
+        return ERROR;
     std::vector<std::string> vsaddrs;
     split(ssaddrs.c_str(), vsaddrs);
     if (vsaddrs.empty()) {
@@ -424,7 +424,7 @@ int client_c::filesize(char const* appid, char const* userid,
                 }
                 return result;
             }
-        }        
+        }
     }
 
     return result;
@@ -452,7 +452,7 @@ int client_c::download(char const* appid, char const* userid,
     int result;
     std::string ssaddrs;
     if ((result = saddrs(appid, userid, fileid, ssaddrs)) != OK)
-        return result;
+        return ERROR;
     std::vector<std::string> vsaddrs;
     split(ssaddrs.c_str(), vsaddrs);
     if (vsaddrs.empty()) {
@@ -503,7 +503,7 @@ int client_c::download(char const* appid, char const* userid,
                 }
                 return result;
             }
-        }        
+        }
     }
 
     return result;
@@ -530,7 +530,7 @@ int client_c::del(char const* appid, char const* userid,
     int result;
     std::string ssaddrs;
     if ((result = saddrs(appid, userid, fileid, ssaddrs)) != OK)
-        return result;
+        return ERROR;
     std::vector<std::string> vsaddrs;
     split(ssaddrs.c_str(), vsaddrs);
     if (vsaddrs.empty()) {
@@ -580,7 +580,7 @@ int client_c::del(char const* appid, char const* userid,
                 }
                 return result;
             }
-        }        
+        }
     }
 
     return result;

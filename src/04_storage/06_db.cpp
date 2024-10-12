@@ -7,7 +7,7 @@
 #include "05_db.h"
 
 // 构造函数
-db_c::db_c(void): m_mysql(mysql_init(nullptr)) { // 创建MySQL对象
+db_c::db_c(void): m_mysql(mysql_init(NULL)) { // 创建MySQL对象
     if (!m_mysql)
         logger_error("create dao fail: %s", mysql_error(m_mysql));
 }
@@ -17,7 +17,7 @@ db_c::~db_c(void) {
     // 销毁MySQL对象
     if (m_mysql) {
         mysql_close(m_mysql);
-        m_mysql = nullptr;
+        m_mysql = NULL;
     }
 }
 
@@ -29,7 +29,7 @@ int db_c::connect(void) {
     for (std::vector<std::string>::const_iterator maddr =
         g_maddrs.begin(); maddr != g_maddrs.end(); ++maddr)
         if ((m_mysql = mysql_real_connect(mysql, maddr->c_str(),
-            "root", "123456", "tnv_storagedb", 0, nullptr, 0)))
+            "root", "123456", "tnv_storagedb", 0, NULL, 0)))
             return OK;
 
     logger_error("connect database fail: %s",
@@ -62,7 +62,7 @@ int db_c::get(char const* appid, char const* userid, char const* fileid,
     // 缓存中没有再查询数据库
     std::string tablename = table_of_user(userid);
     if (tablename.empty()) {
-        logger_error("tablename is null, appid: %s, "
+        logger_error("tablename is empty, appid: %s, "
             "userid: %s, fileid: %s", appid, userid, fileid);
         return ERROR;
     }
@@ -103,13 +103,13 @@ int db_c::get(char const* appid, char const* userid, char const* fileid,
     return OK;
 }
 
-// 设置文件ID和据经及大小的对应关系
+// 设置文件ID和路径及大小的对应关系
 int db_c::set(char const* appid, char const* userid, char const* fileid,
     char const* filepath, long long filesize) const {
     // 根据用户ID获取其对应的表名
     std::string tablename = table_of_user(userid);
     if (tablename.empty()) {
-        logger_error("tablename is null, appid: %s, "
+        logger_error("tablename is empty, appid: %s, "
             "userid: %s, fileid: %s", appid, userid, fileid);
         return ERROR;
     }
@@ -137,20 +137,20 @@ int db_c::set(char const* appid, char const* userid, char const* fileid,
 }
 
 // 删除文件ID
-int db_c::del(char const* appid, char const* userid,
+int db_c::del(char const* appid, char const*userid,
     char const* fileid) const {
     // 先从缓存中删除文件ID
     cache_c cache;
     acl::string key;
     key.format("uid:fid:%s:%s", userid, fileid);
     if (cache.del(key) != OK)
-        logger_warn("delete fail: appid: %s, "
+        logger_warn("delete cache fail: appid: %s, "
             "userid: %s, fileid: %s", appid, userid, fileid);
 
     // 再从数据库中删除文件ID
     std::string tablename = table_of_user(userid);
     if (tablename.empty()) {
-        logger_error("tablename is null, appid: %s, "
+        logger_error("tablename is empty, appid: %s, "
             "userid: %s, fileid: %s", appid, userid, fileid);
         return ERROR;
     }
@@ -185,10 +185,10 @@ std::string db_c::table_of_user(char const* userid) const {
 }
 
 // 计算哈希值
-unsigned int db_c::hash(char const* buf, ssize_t len) const {
+unsigned int db_c::hash(char const* buf, size_t len) const {
     unsigned int h = 0;
 
-    for (ssize_t i = 0; i < len; ++i)
+    for (size_t i = 0; i < len; ++i)
         h ^= i&1 ? ~(h<<11^buf[i]^h>>5) : h<<7^buf[i]^h>>3;
 
     return h;

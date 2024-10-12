@@ -5,7 +5,7 @@
 
 #include <vector>
 #include <string>
-#include<acl-lib/acl_cpp/lib_acl.hpp>
+#include <lib_acl.hpp>
 //
 // 配置信息
 //
@@ -26,7 +26,7 @@ extern int cfg_rtimeout; // Redis读写超时
 extern int cfg_ktimeout; // Redis键超时
 extern acl::master_int_tbl cfg_int[]; // 整型配置表
 
-extern std::vector<std::string> g_spahts; // 存储路径表
+extern std::vector<std::string> g_spaths; // 存储路径表
 extern std::vector<std::string> g_taddrs; // 跟踪服务器地址表
 extern std::vector<std::string> g_iaddrs; // ID服务器地址表
 extern std::vector<std::string> g_maddrs; // MySQL地址表

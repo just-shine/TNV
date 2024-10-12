@@ -2,8 +2,8 @@
 // 实现跟踪客户机线程类
 //
 #include <unistd.h>
-#include "../01_common/02_proto.h"
-#include "../01_common/03_util.h"
+#include "02_proto.h"
+#include "03_util.h"
 #include "01_globals.h"
 #include "13_tracker.h"
 
@@ -36,9 +36,9 @@ void* tracker_c::run(void) {
             continue; // 失败重连
         }
 
-        time_t last = time(nullptr); // 上次心跳
+        time_t last = time(NULL); // 上次心跳
         while (!m_stop) {
-            time_t now = time(nullptr); // 现在
+            time_t now = time(NULL); // 现在
             // 现在离上次心跳已足够久，再跳一次
             if (now - last >= cfg_interval) {
                 // 向跟踪服务器发送心跳包
@@ -54,13 +54,13 @@ void* tracker_c::run(void) {
         conn.close();
     }
 
-    return nullptr;
+    return NULL;
 }
 
 // 向跟踪服务器发送加入包
 int tracker_c::join(acl::socket_stream* conn) const {
     // |包体长度|命令|状态|storage_join_body_t|
-    // |    8   |  1 |  1 |      包体长度     |
+    // |    8   |  1 |  1 |     包体长度      |
     // 构造请求
     long long bodylen = sizeof(storage_join_body_t);
     long long requlen = HEADLEN + bodylen;
@@ -74,7 +74,7 @@ int tracker_c::join(acl::socket_stream* conn) const {
     strcpy(sjb->sjb_hostname, g_hostname.c_str()); // 主机名
     ston(cfg_bindport, sjb->sjb_port);             // 端口号
     lton(g_stime, sjb->sjb_stime);                 // 启动时间
-    lton(time(nullptr), sjb->sjb_jtime);              // 加入时间
+    lton(time(NULL), sjb->sjb_jtime);              // 加入时间
 
     // 发送请求
     if (conn->write(requ, requlen) < 0) {
@@ -143,7 +143,7 @@ int tracker_c::join(acl::socket_stream* conn) const {
 // 向跟踪服务器发送心跳包
 int tracker_c::beat(acl::socket_stream* conn) const {
     // |包体长度|命令|状态|storage_beat_body_t|
-    // |    8   |  1 |  1 |      包体长度     |
+    // |    8   |  1 |  1 |     包体长度      |
     // 构造请求
     long long bodylen = sizeof(storage_beat_body_t);
     long long requlen = HEADLEN + bodylen;
@@ -196,7 +196,8 @@ int tracker_c::beat(acl::socket_stream* conn) const {
     // 检查包体长度
     long long expected = ERROR_NUMB_SIZE + ERROR_DESC_SIZE;
     if (bodylen > expected) {
-        logger_error("invalid body length: %lld > %lld", bodylen, expected);
+        logger_error("invalid body length: %lld > %lld",
+            bodylen, expected);
         return ERROR;
     }
 
@@ -214,7 +215,6 @@ int tracker_c::beat(acl::socket_stream* conn) const {
     if (bodylen > ERROR_NUMB_SIZE)
         errdesc = body + ERROR_NUMB_SIZE;
 
-    logger_error("beat fail, errnumb: %d, errdesc: %s",
-        errnumb, errdesc);
+    logger_error("beat fail, errnumb: %d, errdesc: %s", errnumb, errdesc);
     return ERROR;
 }

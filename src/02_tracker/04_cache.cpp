@@ -29,7 +29,7 @@ int cache_c::get(char const* key, acl::string& value) const {
     acl::redis redis;
     redis.set_client(rconn);
 
-    // 借助Redis客户机根据键获取其对应的值
+    // 借助Redis客户机根据键获取其值
     if (!redis.get(tracker_key.c_str(), value)) {
         logger_warn("get cache fail, key: %s", tracker_key.c_str());
         g_rconns->put(rconn, false);

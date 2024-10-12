@@ -35,19 +35,19 @@ typedef struct storage_join_body {
     char sjb_port[sizeof(in_port_t)];            // 端口号
     char sjb_stime[sizeof(time_t)];              // 启动时间
     char sjb_jtime[sizeof(time_t)];              // 加入时间
-}   storage_join_body_t;                         // 存储服务器加入包体
+}   storage_join_body_t; // 存储服务器加入包体
 
 typedef struct storage_beat_body {
     char sbb_groupname[STORAGE_GROUPNAME_MAX+1]; // 组名
     char sbb_hostname[STORAGE_HOSTNAME_MAX+1];   // 主机名
-}   storage_beat_body_t;                         // 存储服务器心跳包体
+}   storage_beat_body_t; // 存储服务器心跳包体
 //
 // 命令
 //
 #define CMD_TRACKER_JOIN   10 // 存储服务器向跟踪服务器发送加入包
 #define CMD_TRACKER_BEAT   11 // 存储服务器向跟踪服务器发送心跳包
-#define CMD_TRACKER_SADDRS 12 // 客户机向跟踪服务器获取存储服务器地址列表
-#define CMD_TRACKER_GROUPS 13 // 客户机向跟踪服务器获取组列表
+#define CMD_TRACKER_SADDRS 12 // 客户机从跟踪服务器获取存储服务器地址列表
+#define CMD_TRACKER_GROUPS 13 // 客户机从跟踪服务器获取组列表
 
 #define CMD_ID_GET 40 // 存储服务器从ID服务器获取ID
 

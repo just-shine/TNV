@@ -39,7 +39,7 @@ typedef struct storage_join {
     in_port_t sj_port;                               // 端口号
     time_t    sj_stime;                              // 启动时间
     time_t    sj_jtime;                              // 加入时间
-}   storage_join_t;                                  // 存储服务器加入
+}   storage_join_t; // 存储服务器加入
 
 typedef struct storage_info {
     char             si_version[STORAGE_VERSION_MAX+1];   // 版本
@@ -50,7 +50,7 @@ typedef struct storage_info {
     time_t           si_jtime;                            // 加入时间
     time_t           si_btime;                            // 心跳时间
     storage_status_t si_status;                           // 状态
-}   storage_info_t;                                       // 存储服务器信息
+}   storage_info_t; // 存储服务器信息
 //
 // ID键值对
 //

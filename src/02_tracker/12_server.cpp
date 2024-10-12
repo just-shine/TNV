@@ -2,13 +2,13 @@
 // 实现服务器类
 //
 #include <unistd.h>
-#include "../01_common/02_proto.h"
-#include "../01_common/03_util.h"
+#include "02_proto.h"
+#include "03_util.h"
 #include "01_globals.h"
 #include "07_service.h"
 #include "11_server.h"
 
-// 进程启动时被调用
+// 进程切换用户后被调用
 void server_c::proc_on_init(void) {
     // 应用ID表
     if (!cfg_appids || !*cfg_appids)
@@ -32,7 +32,7 @@ void server_c::proc_on_init(void) {
         if (g_raddrs.empty())
             logger_error("redis addresses is empty");
         else {
-            // 遍历Redis地址表
+            // 遍历Redis地址表，尝试创建连接池
             for (std::vector<std::string>::const_iterator raddr =
                 g_raddrs.begin(); raddr != g_raddrs.end(); ++raddr)
                 if ((g_rconns = new acl::redis_client_pool(
@@ -68,11 +68,11 @@ void server_c::proc_on_init(void) {
         cfg_ctimeout, cfg_rtimeout, cfg_ktimeout);
 }
 
-// 进程意图退出时被调用
-// 返回true，进程立即退出，否则
-// 若配置项ioctl_quick_abort非0，进程立即退出，否则
-// 待所有客户机连接都关闭后，再退出
-bool server_c::proc_exit_timer(ssize_t nclients, ssize_t nthreads) {
+// 子进程意图退出时被调用
+// 返回true，子进程立即退出，否则
+// 若配置项ioctl_quick_abort非0，子进程立即退出，否则
+// 待所有客户机连接都关闭后，子进程再退出
+bool server_c::proc_exit_timer(size_t nclients, size_t nthreads) {
     // 终止存储服务器状态检查线程
     m_status->stop();
 
@@ -86,30 +86,34 @@ bool server_c::proc_exit_timer(ssize_t nclients, ssize_t nthreads) {
 
 // 进程退出前被调用
 void server_c::proc_on_exit(void) {
-    // 回收存储服务器状态检查线程
-    if (m_status->wait(nullptr))
+    // 回收存储服务器状态检测线程
+    if (!m_status->wait(NULL))
         logger_error("wait thread #%lu fail", m_status->thread_id());
 
     // 销毁存储服务器状态检查线程
     if (m_status) {
         delete m_status;
-        m_status = nullptr;
+        m_status = NULL;
     }
 
     // 销毁Redis连接池
     if (g_rconns) {
         delete g_rconns;
-        g_rconns = nullptr;
+        g_rconns = NULL;
     }
 }
 
 // 线程获得连接时被调用
+// 返回true，连接将被用于后续通信，否则
+// 函数返回后即关闭连接
 bool server_c::thread_on_accept(acl::socket_stream* conn) {
     logger("connect, from: %s", conn->get_peer());
     return true;
 }
 
 // 与线程绑定的连接可读时被调用
+// 返回true，保持长连接，否则
+// 函数返回后即关闭连接
 bool server_c::thread_on_read(acl::socket_stream* conn) {
     // 接收包头
     char head[HEADLEN];
@@ -129,14 +133,14 @@ bool server_c::thread_on_read(acl::socket_stream* conn) {
 }
 
 // 线程读写连接超时时被调用
+// 返回true，继续等待下一次读写，否则
+// 函数返回后即关闭连接
 bool server_c::thread_on_timeout(acl::socket_stream* conn) {
     logger("read timeout, from: %s", conn->get_peer());
     return true;
 }
 
-// 以上三个函数返回true，连接将被保持，否则连接即被关闭
-
-// 连接关闭前被调用
+// 与线程绑定的连接关闭时被调用
 void server_c::thread_on_close(acl::socket_stream* conn) {
     logger("client disconnect, from: %s", conn->get_peer());
 }

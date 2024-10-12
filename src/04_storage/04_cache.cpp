@@ -1,9 +1,9 @@
 // 存储服务器
 // 实现缓存类
 //
-#include"../01_common/01_types.h"
-#include"01_globals.h"
-#include"03_cache.h"
+#include "01_types.h"
+#include "01_globals.h"
+#include "03_cache.h"
 
 // 根据键获取其值
 int cache_c::get(char const* key, acl::string& value) const {
@@ -30,7 +30,7 @@ int cache_c::get(char const* key, acl::string& value) const {
     acl::redis redis;
     redis.set_client(rconn);
 
-    // 借助Redis客户机根据键获取其对应的值
+    // 借助Redis客户机根据键获取其值
     if (!redis.get(storage_key.c_str(), value)) {
         logger_warn("get cache fail, key: %s", storage_key.c_str());
         g_rconns->put(rconn, false);
@@ -68,7 +68,7 @@ int cache_c::set(char const* key, char const* value,
     // 从连接池中获取一个Redis连接
     acl::redis_client* rconn = (acl::redis_client*)g_rconns->peek();
     if (!rconn) {
-        logger_warn("peek redis connection fail, key: %s",
+        logger_warn("peek Redis connection fail, key: %s",
             storage_key.c_str());
         return ERROR;
     }
@@ -109,7 +109,7 @@ int cache_c::del(char const* key) const {
     // 从连接池中获取一个Redis连接
     acl::redis_client* rconn = (acl::redis_client*)g_rconns->peek();
     if (!rconn) {
-        logger_warn("peek redis connection fail, key: %s",
+        logger_warn("peek Redis connection fail, key: %s",
             storage_key.c_str());
         return ERROR;
     }

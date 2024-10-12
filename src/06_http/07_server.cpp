@@ -59,7 +59,7 @@ bool server_c::thread_on_accept(acl::socket_stream* conn) {
         (acl::session*)new acl::redis_session(*m_redis, cfg_maxthrds) :
         (acl::session*)new acl::memcache_session("127.0.0.1:11211");
 
-    // 创建并设置业务服务器对象
+    // 创建并设置业务服务对象
     conn->set_ctx(new service_c(conn, session));
 
     return true;

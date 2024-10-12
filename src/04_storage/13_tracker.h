@@ -3,8 +3,7 @@
 //
 #pragma once
 
-#include<acl-lib/acl_cpp/lib_acl.hpp>
-
+#include <lib_acl.hpp>
 //
 // 跟踪客户机线程类
 //

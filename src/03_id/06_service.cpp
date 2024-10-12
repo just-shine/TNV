@@ -1,11 +1,10 @@
-// 跟踪服务器
+// ID服务器
 // 实现业务服务类
 //
-#include <algorithm>
-#include "../01_common/02_proto.h"
-#include "../01_common/03_util.h"
-#include "03_db.h"
+#include "02_proto.h"
+#include "03_util.h"
 #include "01_globals.h"
+#include "03_db.h"
 #include "05_service.h"
 
 // 业务处理
@@ -30,7 +29,7 @@ bool service_c::business(acl::socket_stream* conn,
     switch (command) {
         case CMD_ID_GET:
             // 处理来自存储服务器的获取ID请求
-            result = get(conn,bodylen);
+            result = get(conn, bodylen);
             break;
 
         default:
@@ -43,123 +42,123 @@ bool service_c::business(acl::socket_stream* conn,
 
 ////////////////////////////////////////////////////////////////////////
 
-// 处理来自存储服务器的加入包
-bool service_c::get(acl::socket_stream* conn,
-    long long bodylen) const {
-        // |包体长度|命令|状态|ID键|
-        //|8       |1   | 1 | 64+1|
-        //检查包体长度
-        long long expected = ID_KEY_MAX +1;//期望包体长度
-        if(bodylen > expected){
-            error(conn,-1,"invalid body length %lld > %lld",bodylen,expected);
-            return false;
-        }
-        //接受包体
-        char body[bodylen];
-        if(conn->read(body,bodylen) < 0){
-            logger_error("read fail : %s,bodylen: %lld,from : %s",
-                        acl::last_serror(),bodylen,conn->get_peer());
-        }
+// 处理来自存储服务器的获取ID请求
+bool service_c::get(acl::socket_stream* conn, long long bodylen) const {
+    // |包体长度|命令|状态|ID键|
+    // |    8   |  1 |  1 |64+1|
+    // 检查包体长度
+    long long expected = ID_KEY_MAX + 1; // 期望包体长度
+    if (bodylen > expected) {
+        error(conn, -1, "invalid body length: %lld > %lld",
+            bodylen, expected);
+        return false;
+    }
 
-        //根据ID的键获取其值
-        long value = get(body);
-        if(value < 0){
-            error(conn,-1,"get id fail, key: %s",body);
-        }
-        logger("get id ok,key:%s,value: %ld",body,value);
+    // 接收包体
+    char body[bodylen];
+    if (conn->read(body, bodylen) < 0) {
+        logger_error("read fail: %s, bodylen: %lld, from: %s",
+            acl::last_serror(), bodylen, conn->get_peer());
+        return false;
+    }
 
-        return id(conn,value);
+    // 根据ID的键获取其值
+    long value = get(body);
+    if (value < 0) {
+        error(conn, -1, "get id fail, key: %s", body);
+        return false;
+    }
+
+    logger("get id ok, key: %s, value: %ld", body, value);
+
+    return id(conn, value);
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
 // 根据ID的键获取其值
 long service_c::get(char const* key) const {
-   //互斥锁加锁
-   if (errno = pthread_mutex_lock(&g_mutex))
-   {
-       logger_error("call pthread_mutex_lock fail: %s", strerror(errno));
-       return -1;
-   }
-   long value = -1;
+    // 互斥锁加锁
+    if ((errno = pthread_mutex_lock(&g_mutex))) {
+        logger_error("call pthread_mutex_lock fail: %s",
+            strerror(errno));
+        return -1;
+    }
 
-   // 在ID表查找ID
-   std::vector<id_pair_t>::iterator id;
-   for (id = g_ids.begin(); id != g_ids.end(); ++id)
-   {
-       if (!strcmp(id->id_key, key))
-       {
-           break;
-       }
-       if (id != g_ids.end())
-       { // 找到该ID
-           if (id->id_offset < cfg_maxoffset)
-           { //  该ID的偏移未及上限
-               value = id->id_value + id->id_offset;
-               ++id->id_offset;
-           }
-           else if ((value = fromdb(key)) >= 0)
-           { // 从数据库中获取ID值
-               // 更新ID表中的ID
-               id->id_value = value;
-               id->id_offset = 1;
-           }
-       }
-       else if ((value = fromdb(key)) >= 0)
-       { // 从数据库中获取ID值
-           // 在ID表中添加ID
-           id_pair_t id;
-           strcpy(id.id_key, key);
-           id.id_value = value;
-           id.id_offset = 1;
-           g_ids.push_back(id);
-       }
-
-       // cfg_maxoffset
-   }
-   // 互斥锁解锁
-   if (errno = pthread_mutex_unlock(&g_mutex))
-   {
-       logger_error("call pthread_mutex_unlock fail: %s", strerror(errno));
-       return false;
-   }
-   return value;
-}
-
-//从数据库中获取ID值
-long service_c::fromdb(char const* key) const{
-    //数据库访问对象
-    db_c db;
-    //链接数据库
-    if(db.connect() != OK) return -1;
     long value = -1;
 
-    //获取ID当前值,同时产生下一个值
-    if(db.get(key,cfg_maxoffset , &value) != OK) return -1;
+    // 在ID表中查找ID
+    std::vector<id_pair_t>::iterator id;
+    for (id = g_ids.begin(); id != g_ids.end(); ++id)
+        if (!strcmp(id->id_key, key))
+            break;
+    if (id != g_ids.end()) { // 找到该ID
+        if (id->id_offset < cfg_maxoffset) { // 该ID的偏移未及上限
+            value = id->id_value + id->id_offset;
+            ++id->id_offset;
+        }
+        else if ((value = fromdb(key)) >= 0) { // 从数据库中获取ID值
+            // 更新ID表中的ID
+            id->id_value = value;
+            id->id_offset = 1;
+        }
+    }
+    else if ((value = fromdb(key)) >= 0) { // 从数据库中获取ID值
+        // 在ID表中添加ID
+        id_pair_t id;
+        strcpy(id.id_key, key);
+        id.id_value = value;
+        id.id_offset = 1;
+        g_ids.push_back(id);
+    }
+
+    // 互斥锁解锁
+    if ((errno = pthread_mutex_unlock(&g_mutex))) {
+        logger_error("call pthread_mutex_unlock fail: %s",
+            strerror(errno));
+        return -1;
+    }
 
     return value;
-
-
 }
+
+// 从数据库中获取ID值
+long service_c::fromdb(char const* key) const {
+    db_c db; // 数据库访问对象
+
+    // 连接数据库
+    if (db.connect() != OK)
+        return -1;
+
+    long value = -1;
+
+    // 获取ID当前值，同时产生下一个值
+    if (db.get(key, cfg_maxoffset, &value) != OK)
+        return -1;
+
+    return value;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
-// 应答成功
-bool service_c::id(acl::socket_stream* conn,long value) const {
+// 应答ID
+bool service_c::id(acl::socket_stream* conn, long value) const {
     // |包体长度|命令|状态|ID值|
-    // |    8   |  1 |  1 |8  |
+    // |    8   |  1 |  1 |  8 |
     // 构造响应
     long long bodylen = BODYLEN_SIZE;
     long long resplen = HEADLEN + bodylen;
     char resp[resplen] = {};
-    llton(bodylen,resp);
+    llton(bodylen, resp);
     resp[BODYLEN_SIZE] = CMD_ID_REPLY;
-    resp[BODYLEN_SIZE + COMMAND_SIZE] = 0;
-    lton(value,resp+HEADLEN);
-    //发送响应
-    if(conn->write(resp,resplen) < 0){
-        logger_error("write fail: %s, resplen: %lld,to: %s",
-        acl::last_serror(),resplen,conn->get_peer());
+    resp[BODYLEN_SIZE+COMMAND_SIZE] = 0;
+    lton(value, resp + HEADLEN);
+
+    // 发送响应
+    if (conn->write(resp, resplen) < 0) {
+        logger_error("write fail: %s, resplen: %lld, to: %s",
+            acl::last_serror(), resplen, conn->get_peer());
+        return false;
     }
 
     return true;
@@ -179,9 +178,9 @@ bool service_c::error(acl::socket_stream* conn, short errnumb,
     desc.format("[%s] %s", g_hostname.c_str(), errdesc);
     memset(errdesc, 0, sizeof(errdesc));
     strncpy(errdesc, desc.c_str(), ERROR_DESC_SIZE - 1);
-    ssize_t desclen = strlen(errdesc);
+    size_t desclen = strlen(errdesc);
     desclen += desclen != 0;
-    
+
     // |包体长度|命令|状态|错误号|错误描述|
     // |    8   |  1 |  1 |   2  | <=1024 |
     // 构造响应

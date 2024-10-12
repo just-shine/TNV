@@ -14,7 +14,7 @@ acl::master_str_tbl cfg_str[] = { // 字符串配置表
     {"redis_addrs", "127.0.0.1:6379", &cfg_raddrs},
     {0, 0, 0}};
 
-int cfg_interval; // 存储服务器状态检查间隔秒数
+int cfg_interval; // 存储服务器状态检测间隔秒数
 int cfg_mtimeout; // MySQL读写超时
 int cfg_maxconns; // Redis连接池最大连接数
 int cfg_ctimeout; // Redis连接超时

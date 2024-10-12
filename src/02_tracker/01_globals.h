@@ -7,7 +7,7 @@
 #include <string>
 #include <map>
 #include <list>
-#include<acl-lib/acl_cpp/lib_acl.hpp>
+#include <lib_acl.hpp>
 #include "01_types.h"
 //
 // 配置信息
@@ -33,11 +33,3 @@ extern std::string g_hostname; // 主机名
 extern std::map<std::string,
     std::list<storage_info_t> > g_groups; // 组表
 extern pthread_mutex_t g_mutex; // 互斥锁
-
-
-
-
-
-
-
-

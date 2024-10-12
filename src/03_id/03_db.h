@@ -3,9 +3,7 @@
 //
 #pragma once
 
-#include </usr/include/mysql/mysql.h>
-
-
+#include <mysql.h>
 //
 // 数据库访问类
 //
@@ -19,7 +17,7 @@ public:
     // 连接数据库
     int connect(void);
 
-    // get the current value, step to next value
+    // 获取ID当前值，同时产生下一个值
     int get(char const* key, int inc, long* value) const;
 
 private:
