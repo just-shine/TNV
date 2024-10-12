@@ -50,7 +50,7 @@ int client_c::init(char const* taddrs,
     // 创建连接池管理器
     if (!(s_mngr = new mngr_c)) {
         logger_error("create connection pool manager fail: %s",
-            acl_last_serror());
+            acl::last_serror());
         return ERROR;
     }
 
