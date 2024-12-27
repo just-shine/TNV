@@ -4,3 +4,4 @@
 /upload
 *.o
 *.gch
+.idea
